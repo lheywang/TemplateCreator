@@ -1,8 +1,10 @@
 # Python libs
 import pathlib
+import base64
 
 # Locals files
 from prints import printHome, printMenu, printSep, printFiles
+from batch import printHeader, printData
 
 def TemplateCreator():
     # First, input the source folder for the template :
@@ -28,7 +30,6 @@ def TemplateCreator():
     variables = []
 
     for file in files:
-        print(file)
         try:
             # Try to open and reas the file.
             with open(file, "r") as f:
@@ -41,7 +42,6 @@ def TemplateCreator():
 
                         files_to_edit.append(file)
                         tmp_s = line.split("##")
-                        print(tmp_s)
 
                         # Handle single variable per lines
                         if len(tmp_s) == 3:
@@ -56,8 +56,6 @@ def TemplateCreator():
                             del tmp_s[0]
                             del tmp_s[0]
 
-                            print(tmp_s)
-
                             # The next one will be a variable name
                             for index, text in enumerate(tmp_s):
                                 # Ignore one over two iterations
@@ -66,14 +64,23 @@ def TemplateCreator():
 
                                 variables.append(tmp_s[index])
 
-                            
-
-            
         except UnicodeDecodeError: # Handle non text files that aren't going to be parsed
             continue
 
-    # Ok for now ! Let's generate scripts, encode data and so...
-    print(files_to_edit, variables)
+    # Then, encode all of the data
+    encoded = [] 
+    for file in files:
+        with open(file, "rb") as f:
+            tmp = f.read()
+            encoded.append(base64.b64encode(tmp))
+
+    # Need to write the preample : File count, list, edited files, needed variables and soooo
+    # Need to add the logic to handle theses variables and file edits.
+
+    # Generate scripts
+    with open(input_path + "/template.bat", "w+") as f:
+        printHeader(f)
+        printData(f, "test.png", 0, encoded[4])
 
 
 if __name__ == "__main__":
