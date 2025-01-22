@@ -16,8 +16,22 @@ echo =============================================================\n"""
     )
     return
 
+def printAskForLocation(file: __file__):
 
-def printData(file: __file__, filename: str, fileIndex: int, encodeddata):
+    file.write(
+        f"""\n\n\
+:: =============================================================\n\
+:: ASK FOR PATH AND GO TO IT\n\
+:: =============================================================\n""")
+    file.write(f"set /p base_path=Enter wanted folder location : \n")
+    file.write(f"set /p base_name=Enter wanted folder name : \n")
+
+    file.write(f"cd /D %base_path%\n")
+    file.write(f"if not exist %base_name% mkdir %base_name%\n")
+    file.write(f"cd %base_name%\n")
+
+
+def printData(file: __file__, filename: str, fileIndex: int, encodeddata, filetoedit):
     # Print some infos and delimiters to remain the script a correct structure
     file.write(
         f"""\n\n\
@@ -40,6 +54,10 @@ def printData(file: __file__, filename: str, fileIndex: int, encodeddata):
     # Parameters writing...
     file.write(f"set File{fileIndex}Name={filename}\n")
     file.write(f"set File{fileIndex}ChunkLen={len(chunks)}\n")
+    if filetoedit == True:
+        file.write(f"set File{fileIndex}Edit=1\n")
+    else:
+        file.write(f"set File{fileIndex}Edit=0\n")
 
     # Then, split theses chunks into 64 character lines. We do this to be more
     # readable and easier to handle with text editor with struggle with long lines.
@@ -58,3 +76,55 @@ def printData(file: __file__, filename: str, fileIndex: int, encodeddata):
 
     # end of the function, the file has been written !
     return
+
+def printVariables(file: __file__, variables):
+    # First, make sure that we got a list:
+
+    vars = list(variables)
+    
+    file.write(
+        f"""\n\n\
+:: =============================================================\n\
+:: VARIABLES INPUTS\n\
+:: =============================================================\n""")
+    
+    file.write("""\
+echo =============================================================\n\
+echo # Please fill the variables to be replaced in the files      #\n\
+echo =============================================================\n""")
+
+    for var in vars:
+        file.write(f"set /p {var}=Enter value for field : '{var}' : \n")
+
+    return 
+
+def printFolderStructure(file: __file__, folders):
+    
+    folds = list(folders)
+    
+    file.write(
+        f"""\n\n\
+:: =============================================================\n\
+:: FOLDERS CREATION\n\
+:: =============================================================\n""")
+    
+    for folder in folds:
+        file.write(f"if not exist '{str(folder)}' mkdir {str(folder)}\n")
+
+    return
+
+def printFileCreation(file: __file__, files):
+    filest = list(files)
+
+    file.write(
+        f"""\n\n\
+:: =============================================================\n\
+:: FILES CREATION\n\
+:: =============================================================\n""")
+    
+    for name in filest:
+        file.write(f"echo. > {name}\n")
+
+    return
+
+

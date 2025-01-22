@@ -4,7 +4,15 @@ import base64
 
 # Locals files
 from prints import printHome, printMenu, printSep, printFiles
-from batch import printHeader, printData
+from batch import (
+    printHeader,
+    printData,
+    printVariables,
+    printFolderStructure,
+    printFileCreation,
+    printAskForLocation,
+)
+
 
 def TemplateCreator():
     # First, input the source folder for the template :
@@ -21,7 +29,7 @@ def TemplateCreator():
         except:
             print("Please enter a valid path !")
 
-    # Get the list of all the files, and then print them    
+    # Get the list of all the files, and then print them
     files = [x for x in base_path if x.is_file()]
     printFiles(files)
 
@@ -37,7 +45,7 @@ def TemplateCreator():
 
                 # Iterate over the lines to mark any variables
                 for line in lines:
-        
+
                     if "##" in line:
 
                         files_to_edit.append(file)
@@ -64,15 +72,36 @@ def TemplateCreator():
 
                                 variables.append(tmp_s[index])
 
-        except UnicodeDecodeError: # Handle non text files that aren't going to be parsed
+        except (
+            UnicodeDecodeError
+        ):  # Handle non text files that aren't going to be parsed
             continue
 
     # Then, encode all of the data
-    encoded = [] 
+    encoded = []
     for file in files:
         with open(file, "rb") as f:
             tmp = f.read()
             encoded.append(base64.b64encode(tmp))
+
+    # Simplify files path
+    rel_files = []
+    folders = []
+    for file in files:
+        # Compute relative path
+        tmp = file.relative_to(pathlib.Path(input_path))
+
+        # Append relative file and folder
+        rel_files.append(tmp)
+        folders.append(tmp.parent)
+
+    # Remove duplicates
+    variables = list(dict.fromkeys(variables))
+    folders = list(dict.fromkeys(folders))
+
+    # Remove '.' path
+    if pathlib.Path(".") in folders:
+        folders.remove(pathlib.Path("."))
 
     # Need to write the preample : File count, list, edited files, needed variables and soooo
     # Need to add the logic to handle theses variables and file edits.
@@ -80,7 +109,11 @@ def TemplateCreator():
     # Generate scripts
     with open(input_path + "/template.bat", "w+") as f:
         printHeader(f)
-        printData(f, "test.png", 0, encoded[4])
+        printAskForLocation(f)
+        printFolderStructure(f, folders)
+        printFileCreation(f, rel_files)
+        printVariables(f, variables)
+        printData(f, "test.png", 0, encoded[4], True)
 
 
 if __name__ == "__main__":
