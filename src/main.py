@@ -124,7 +124,9 @@ def TemplateCreator():
         for index, file in enumerate(files):
             # Read and encode file
             with open(file, "rb") as f2:
-                tmp = f2.read()
+                # Read and replace ## with ! to mark the value as a variable. 
+                # This is done here since it work with batch file only !
+                tmp = f2.read().replace(b"##", b"!")
                 tmp = base64.b64encode(tmp)
 
                 edit = False
