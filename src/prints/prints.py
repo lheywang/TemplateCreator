@@ -9,10 +9,6 @@ def printHome():
 ===============================================================================""")
     return
 
-
-def printMenu():
-    pass
-
 def printSep():
     print("===============================================================================")
     return
@@ -21,5 +17,6 @@ def printFiles(files):
     printSep()
     print("""\
 Found files on the target folder :""")
-    for file in files:
-        print(f"- {file}")
+    for index, file in enumerate(files):
+        print(f"- [{index:3}] : {file}")
+

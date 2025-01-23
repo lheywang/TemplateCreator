@@ -1,1 +1,1 @@
-from .prints import printHome, printMenu, printSep, printFiles
+from .prints import printHome, printSep, printFiles

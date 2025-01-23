@@ -3,7 +3,7 @@ import pathlib
 import base64
 
 # Locals files
-from prints import printHome, printMenu, printSep, printFiles
+from prints import printHome, printSep, printFiles
 from batch import (
     printHeader,
     printData,
@@ -11,6 +11,8 @@ from batch import (
     printFolderStructure,
     printFileCreation,
     printAskForLocation,
+    printFilesInfos,
+    printDecoder
 )
 
 
@@ -32,6 +34,20 @@ def TemplateCreator():
     # Get the list of all the files, and then print them
     files = [x for x in base_path if x.is_file()]
     printFiles(files)
+    printSep()
+
+    is_file_valid = False
+    while is_file_valid == False:
+        try:
+            BaseFileID = int(input("Enter the ID of the file for which the name shall be customized : "))
+            if BaseFileID <= len(files):
+                is_file_valid = True
+            else:
+                print("Enterred ID is valid but does not correspond to any file !")
+        except:
+            print("Please enter valid ID !")
+
+    printSep()
 
     # detect files and variables to be modified
     files_to_edit = []
@@ -77,13 +93,6 @@ def TemplateCreator():
         ):  # Handle non text files that aren't going to be parsed
             continue
 
-    # Then, encode all of the data
-    encoded = []
-    for file in files:
-        with open(file, "rb") as f:
-            tmp = f.read()
-            encoded.append(base64.b64encode(tmp))
-
     # Simplify files path
     rel_files = []
     folders = []
@@ -103,19 +112,32 @@ def TemplateCreator():
     if pathlib.Path(".") in folders:
         folders.remove(pathlib.Path("."))
 
-    # Need to write the preample : File count, list, edited files, needed variables and soooo
-    # Need to add the logic to handle theses variables and file edits.
-
     # Generate scripts
     with open(input_path + "/template.bat", "w+") as f:
         printHeader(f)
         printAskForLocation(f)
+        printFilesInfos(f, len(files))
         printFolderStructure(f, folders)
-        printFileCreation(f, rel_files)
+        printFileCreation(f, rel_files, BaseFileID)
         printVariables(f, variables)
-        printData(f, "test.png", 0, encoded[4], True)
+
+        for index, file in enumerate(files):
+            # Read and encode file
+            with open(file, "rb") as f2:
+                tmp = f2.read()
+                tmp = base64.b64encode(tmp)
+
+                edit = False
+                if file in files_to_edit:
+                    edit = True
+                printData(f, rel_files[index], index, tmp, edit)
+
+        printDecoder(f)
 
 
 if __name__ == "__main__":
     TemplateCreator()
     exit()
+
+    # Add for loops logics to decode files
+    # Add file parsing !
