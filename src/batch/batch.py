@@ -3,7 +3,7 @@ def WriteToLog(file: __file__, Function: str, Message: str):
     file.write(":: LOGS --------------------------------------------------------\n")
     file.write(f"""\
 echo [%date% %time%] ^|     ^\n\
-{Function}     ^|     ^\n\
+{Function:25}     ^|     ^\n\
 {Message} >> logs.txt\n""")
     return
 
@@ -78,7 +78,7 @@ def printData(file: __file__, filename: str, fileIndex: int, encodeddata, fileto
     # Then, print this data into the target file + some infos to be easier to handle !
     # Parameters writing...
     file.write(f"set File{fileIndex}Name={filename}\n")
-    file.write(f"set /A File{fileIndex}ChunkLen={len(chunks)}\n")
+    file.write(f"set /A File{fileIndex}ChunkLen={len(chunks) - 1}\n")
     if filetoedit == True:
         file.write(f"set /A File{fileIndex}Edit=1\n")
     else:
@@ -209,33 +209,35 @@ def printDecoder(file: __file__):
     # First, iterate over different files:
     file.write(
         f"""
-for /l %%i in (0, 1, %file_count% - 1) do (
+for /l %%i in (0, 1, %file_count%) do (
                
     :: If file is non empty :
     if defined File%%iName (
     
         :: list all chunks
-        for /l %%e in (0, 1, File%%iChunkLen - 1) do (
+        for /l %%e in (0, 1, !File%%iChunkLen! - 1) do (
             echo !File%%iEncoded%%e! >> tmp.b64
         )
                
         :: file is non edited, dump directly into dest
-        if %File%%iEdit%==0 (
-            certutil.exe -decode tmp.b64 File%%iName
+        if !File%%iEdit!==0 (
+            echo [%date% %time%] ^| Decoding                              ^| >> logs.txt
+            certutil.exe -f -decode tmp.b64 !File%%iName! >> logs.txt
             del tmp.b64
                
         ) else (
             :: decode file into tmp file
-            certutil.exe -decode tmp.b64 tmp.txt
+            echo [%date% %time%] ^| Decoding                              ^| >> logs.txt
+            certutil.exe -f -decode tmp.b64 tmp.txt >> logs.txt
             
             :: Doing this will force to replace variable automatically...
             for /F "delims=" %%a in (tmp.txt) do (
-	            echo %%a
+	            echo %%a >> !File%%iName!
             )
             
             :: Delete temporary files
-            del tmp.b64
-            del tmp.txt
+            if exist "tmp.txt" del tmp.txt
+            if exist "tmp.b64" del tmp.b64
         )
     )
 )

@@ -116,7 +116,7 @@ def TemplateCreator():
     with open(input_path + "/template.bat", "w+") as f:
         printHeader(f)
         printAskForLocation(f)
-        printFilesInfos(f, len(files))
+        printFilesInfos(f, len(files) - 1)
         printFolderStructure(f, folders)
         printFileCreation(f, rel_files, BaseFileID)
         printVariables(f, variables)
