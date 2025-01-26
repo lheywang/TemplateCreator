@@ -51,6 +51,7 @@ def TemplateCreator():
 
     # detect files and variables to be modified
     files_to_edit = []
+    binary_files = []
     variables = []
 
     for file in files:
@@ -91,6 +92,7 @@ def TemplateCreator():
         except (
             UnicodeDecodeError
         ):  # Handle non text files that aren't going to be parsed
+            binary_files.append(file)
             continue
 
     # Simplify files path
@@ -126,13 +128,22 @@ def TemplateCreator():
             with open(file, "rb") as f2:
                 # Read and replace ## with ! to mark the value as a variable. 
                 # This is done here since it work with batch file only !
-                tmp = f2.read().replace(b"##", b"!")
+
+                # If if the file is not labelled as binary, replace identification char with syntax correct ones
+                # otherwise replacing some raw bytes may create corruptions
+                tmp = f2.read()
+                if file not in binary_files:
+                    tmp = tmp.replace(b"##", b"!")
                 tmp = base64.b64encode(tmp)
 
                 edit = False
                 if file in files_to_edit:
                     edit = True
-                printData(f, rel_files[index], index, tmp, edit)
+
+                if index == BaseFileID:
+                    printData(f, f"%base_name%.{str(rel_files[index]).split(".")[-1]}", index, tmp, edit)
+                else:
+                    printData(f, rel_files[index], index, tmp, edit)
 
         printDecoder(f)
 
@@ -140,6 +151,3 @@ def TemplateCreator():
 if __name__ == "__main__":
     TemplateCreator()
     exit()
-
-    # Add for loops logics to decode files
-    # Add file parsing !
