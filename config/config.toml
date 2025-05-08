@@ -1,0 +1,5 @@
+[Reader]
+MaxFiles = 100
+Token = "##"
+
+[Writter]
