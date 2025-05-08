@@ -35,7 +35,6 @@ if __name__ == "__main__":
                 )
         except:
             print("Please enter valid ID !")
-    printSep()
 
     # Call the adequate function
     if action == 0:
@@ -44,6 +43,9 @@ if __name__ == "__main__":
         rval = Encoder()
     elif action == 2:
         rval = HelpMsg()
+
+    # End line
+    printSep()
 
     # End of the script
     exit(rval)

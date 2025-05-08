@@ -1,3 +1,3 @@
 # Hi !
 
-I'm an HelloWorld ##filename## !
+I'm an HelloWorld ##project## !

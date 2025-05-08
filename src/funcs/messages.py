@@ -34,7 +34,6 @@ Found files on the target folder :"""
 def printEnd():
     print(
         """\
-===============================================================================\n\
 # Exported a blob of the files into data.template. Feel free to share it,     #\n\
 # with your friends !                                                         #\n\
 #                                                                             #\n\

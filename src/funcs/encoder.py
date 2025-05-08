@@ -43,6 +43,7 @@ def Encoder():
     is_path_valid = False
     base_path = None
 
+    printSep()
     # Requesting the user to input a path
     while is_path_valid == False:
         input_path = input("Enter the source folder for the template : ")
@@ -77,10 +78,11 @@ def Encoder():
     # detect files and variables to be modified
     files_to_edit = []
     binary_files = []
-    variables = ["_filename"]  # contain a single base file
+    variables = []
 
     # Get the token value
     token = config["Reader"]["Token"]
+    reserved_var = config["Reader"]["ReservedVariable"]
 
     for file in files:
         try:
@@ -123,6 +125,11 @@ def Encoder():
             binary_files.append(file)
             continue
 
+    # Remove variables that are tied to the project name.
+    for index, var in enumerate(variables):
+        if var == reserved_var:
+            del variables[index]
+
     # Simplify files path
     rel_files = []
     folders = []
@@ -159,6 +166,7 @@ def Encoder():
     blob["Files"] = dict()
     blob["BaseFile"] = str(rel_files[BaseFileID])
     blob["Token"] = token
+    blob["ReservedVariable"] = reserved_var
 
     # Filling some metadata
     blob["Metadata"]["Date"] = datetime.datetime.today()
@@ -179,7 +187,6 @@ def Encoder():
     hasher.update(blob_bytes)
     hash = hasher.digest()
     hash_len = len(hash)
-    print(hash, hash_len)
 
     with open("data.template", "wb") as f:
         f.write(struct.pack(">I", hash_len))  # 4 bytes used !

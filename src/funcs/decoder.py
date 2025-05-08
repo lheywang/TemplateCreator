@@ -130,21 +130,27 @@ def Decoder():
         print("Exiting...")
         return -129
 
-    # Ask for the base filename ?
-    ProjectName = input("What's the name of the project, to custom the base names ? ")
-
     # Variables inputs
     variables = dict()
+
+    # Ask for the base filename ?
+    variables[data["ReservedVariable"]] = input(
+        "What's the name of the project, to custom the base names ? "
+    )
+
     printSep()
     print("Now enter the values for the different variables :")
     for index, var in enumerate(data["VarList"]):
-        if var != "_filename":
+        if var != data["ReservedVariable"]:
             val = str(input(f"- [{index:3}] : {var} = "))
             variables[var] = val
 
+    # Crunching data
+    printSep()
     # Start the loading of the file now
+    tmp_dict = dict()
     # First, create the files and folders
-    for file in data["Files"]:
+    for index, file in enumerate(data["Files"]):
         if file != data["BaseFile"]:
             p = pathlib.Path(file)
             if not p.exists():
@@ -155,7 +161,7 @@ def Decoder():
 
         else:
             source = pathlib.Path(file)
-            p = source.with_stem(ProjectName).with_suffix(
+            p = source.with_stem(variables[data["ReservedVariable"]]).with_suffix(
                 source.suffix
             )  # Rename the file to match the project name !
             if not p.exists():
@@ -164,25 +170,40 @@ def Decoder():
             with open(p, "w+") as f:
                 f.write("")
 
+            # Flag the new file to the edited :
+            data["EditRequired"].append(str(p))
+
+        print(f"Customized [{(index + 1):3} / {len(data["Files"]):3}] : {str(p)}")
+
+        # Append new file name to a temp dict
+        tmp_dict[str(p)] = data["Files"][file]
+
+    # Copy the temp dict to the real one
+    data["Files"] = tmp_dict
+    printSep()
+
     # Then, read the file to check if there is any token and replace them !
-    for file in data["Files"]:
+    for index, file in enumerate(data["Files"]):
         if file in data["EditRequired"]:
-            # Replace the string, due to python quite high performance :
+            # Decode byte encoded string.
+            tmp_content = data["Files"][file].decode()
+
+            # Iterate over variables to be modified
             for var in variables:
-                tmp = str(data["Files"][file]).replace(
+                tmp_content = tmp_content.replace(
                     f"{data["Token"]+var+data["Token"]}", variables[var]
                 )
-                data["Files"][
-                    file
-                ] = tmp.encode()  # Return as byte after subsituation operation.
+                print(data["Token"] + var + data["Token"])
 
-    # Write files
-    for file in data["Files"]:
+            # Save into the dict the modified variable
+            data["Files"][file] = tmp_content.encode()
+
         with open(file, "wb") as f:
-            print(data["Files"][file])
             f.write(data["Files"][file])
 
+        print(f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}")
+
+    printSep()
+    print("Finished creating a new folder from template !")
+
     return 0
-
-
-# \n are not handled !!
