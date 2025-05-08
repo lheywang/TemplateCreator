@@ -77,7 +77,7 @@ def Encoder():
     # detect files and variables to be modified
     files_to_edit = []
     binary_files = []
-    variables = []
+    variables = ["_filename"]  # contain a single base file
 
     # Get the token value
     token = config["Reader"]["Token"]
@@ -134,9 +134,18 @@ def Encoder():
         rel_files.append(tmp)
         folders.append(tmp.parent)
 
+    edit = []
+    for file in files_to_edit:
+        # Compute relative path
+        tmp = file.relative_to(pathlib.Path(input_path))
+
+        # Append relative file and folder
+        edit.append(tmp)
+
     # Remove duplicates
     variables = list(dict.fromkeys(variables))
     folders = list(dict.fromkeys(folders))
+    files_to_edit = list(dict.fromkeys(edit))
 
     # Remove '.' path
     if pathlib.Path(".") in folders:
@@ -145,19 +154,17 @@ def Encoder():
     # Then, creating a big dict of the files
     blob = dict()
     blob["Metadata"] = dict()
-    blob["VarList"] = []
-    blob["EditRequired"] = []
+    blob["VarList"] = variables
+    blob["EditRequired"] = [str(tmp) for tmp in files_to_edit]
     blob["Files"] = dict()
+    blob["BaseFile"] = str(rel_files[BaseFileID])
+    blob["Token"] = token
 
     # Filling some metadata
     blob["Metadata"]["Date"] = datetime.datetime.today()
     blob["Metadata"]["OS"] = platform.system()
     blob["Metadata"]["OSVersion"] = platform.version()
     blob["Metadata"]["User"] = platform.node()
-
-    # Then, fill config variables
-    blob["EditRequired"] = files_to_edit  # To somplify
-    blob["VarList"] = variables
 
     # Then, read files and place them as binary streams into the blob
     for index, file in enumerate(files):

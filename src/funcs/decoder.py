@@ -130,20 +130,59 @@ def Decoder():
         print("Exiting...")
         return -129
 
+    # Ask for the base filename ?
+    ProjectName = input("What's the name of the project, to custom the base names ? ")
+
+    # Variables inputs
+    variables = dict()
+    printSep()
+    print("Now enter the values for the different variables :")
+    for index, var in enumerate(data["VarList"]):
+        if var != "_filename":
+            val = str(input(f"- [{index:3}] : {var} = "))
+            variables[var] = val
+
     # Start the loading of the file now
     # First, create the files and folders
     for file in data["Files"]:
-        p = pathlib.Path(file)
-        if not p.exists():
-            p.parent.mkdir(parents=True, exist_ok=True)
+        if file != data["BaseFile"]:
+            p = pathlib.Path(file)
+            if not p.exists():
+                p.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(p, "w+") as f:
-            f.write("")
+            with open(p, "w+") as f:
+                f.write("")
 
-    # Ask for variables
-    # Then, read the file to check if there is any token
-    # Replace theses variables
-    # Write the files
-    # END
+        else:
+            source = pathlib.Path(file)
+            p = source.with_stem(ProjectName).with_suffix(
+                source.suffix
+            )  # Rename the file to match the project name !
+            if not p.exists():
+                p.parent.mkdir(parents=True, exist_ok=True)
+
+            with open(p, "w+") as f:
+                f.write("")
+
+    # Then, read the file to check if there is any token and replace them !
+    for file in data["Files"]:
+        if file in data["EditRequired"]:
+            # Replace the string, due to python quite high performance :
+            for var in variables:
+                tmp = str(data["Files"][file]).replace(
+                    f"{data["Token"]+var+data["Token"]}", variables[var]
+                )
+                data["Files"][
+                    file
+                ] = tmp.encode()  # Return as byte after subsituation operation.
+
+    # Write files
+    for file in data["Files"]:
+        with open(file, "wb") as f:
+            print(data["Files"][file])
+            f.write(data["Files"][file])
 
     return 0
+
+
+# \n are not handled !!

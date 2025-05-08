@@ -10,6 +10,7 @@
 from funcs.messages import printHome, printSep
 from funcs.encoder import Encoder
 from funcs.decoder import Decoder
+from funcs.help import HelpMsg
 
 # Main file
 if __name__ == "__main__":
@@ -19,13 +20,14 @@ if __name__ == "__main__":
     # Action selection
     print(f"- [{0:3}] : Open a file (.template)")
     print(f"- [{1:3}] : Create a template file")
+    print(f"- [{2:3}] : Print help")
 
     # Wait for a correct user input :
     is_action_valid = False
     while is_action_valid == False:
         try:
             action = int(input("Enter what's the required action ? "))
-            if action <= 1:
+            if action <= 2:
                 is_action_valid = True
             else:
                 print(
@@ -40,6 +42,8 @@ if __name__ == "__main__":
         rval = Decoder()
     elif action == 1:
         rval = Encoder()
+    elif action == 2:
+        rval = HelpMsg()
 
     # End of the script
     exit(rval)
