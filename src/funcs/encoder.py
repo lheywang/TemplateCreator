@@ -14,7 +14,7 @@ import platform
 import hashlib
 import struct
 
-from .messages import printEnd, printFiles, printSep, printMetadata
+from .messages import printEnd, printFiles, printSep, printMetadata, AskUserInteger
 
 
 # Encoder function
@@ -39,7 +39,7 @@ def Encoder():
     with open("../config/config.toml", "rb") as f:
         config = tomllib.load(f)
 
-        # Setting some variable to track state of the program
+    # Setting some variable to track state of the program
     is_path_valid = False
     base_path = None
 
@@ -51,6 +51,8 @@ def Encoder():
         try:
             base_path = pathlib.Path(input_path).glob("**/*")
             is_path_valid = True
+        except KeyboardInterrupt:
+            return 1
         except:
             print("Please enter a valid path !")
 
@@ -60,20 +62,10 @@ def Encoder():
     printSep()
 
     # Getting the name of the custom file
-    is_file_valid = False
-    while is_file_valid == False:
-        try:
-            BaseFileID = int(
-                input(
-                    "Enter the ID of the file for which the name shall be customized : "
-                )
-            )
-            if BaseFileID <= len(files):
-                is_file_valid = True
-            else:
-                print("Enterred ID is valid but does not correspond to any file !")
-        except:
-            print("Please enter valid ID !")
+    # Ask the user to select a file
+    BaseFileID = AskUserInteger(
+        "Enter the ID of the file to be customized ? ", (len(files) - 1)
+    )
 
     # detect files and variables to be modified
     files_to_edit = []
@@ -84,6 +76,7 @@ def Encoder():
     token = config["Reader"]["Token"]
     reserved_var = config["Reader"]["ReservedVariable"]
 
+    # Iterate over file, try to read them and search for replacement tokens
     for file in files:
         try:
             # Try to open and reas the file.
@@ -102,11 +95,12 @@ def Encoder():
                         if len(tmp_s) == 3:
                             variables.append(tmp_s[1])
 
+                        # Handle multiple variables per lines
                         else:
                             # Copy variable name
                             variables.append(tmp_s[1])
 
-                            # Delete three first strings
+                            # Delete three first strings (already treated)
                             del tmp_s[0]
                             del tmp_s[0]
                             del tmp_s[0]
@@ -119,13 +113,13 @@ def Encoder():
 
                                 variables.append(tmp_s[index])
 
-        except (
-            UnicodeDecodeError
-        ):  # Handle non text files that aren't going to be parsed
+        # Handle files that aren't text (images...) and flag them as binary
+        except UnicodeDecodeError:
             binary_files.append(file)
             continue
 
-    # Remove variables that are tied to the project name.
+    # Remove variables that are tied to the project name (this variable will be
+    # asked globally, and shall not be in the variable list)
     for index, var in enumerate(variables):
         if var == reserved_var:
             del variables[index]
@@ -149,7 +143,7 @@ def Encoder():
         # Append relative file and folder
         edit.append(tmp)
 
-    # Remove duplicates
+    # Remove duplicates (otherwise they may be asked twice)
     variables = list(dict.fromkeys(variables))
     folders = list(dict.fromkeys(folders))
     files_to_edit = list(dict.fromkeys(edit))
@@ -158,41 +152,43 @@ def Encoder():
     if pathlib.Path(".") in folders:
         folders.remove(pathlib.Path("."))
 
-    # Then, creating a big dict of the files
+    # Then, creating a big dict of the files and data
     blob = dict()
-    blob["Metadata"] = dict()
     blob["VarList"] = variables
     blob["EditRequired"] = [str(tmp) for tmp in files_to_edit]
-    blob["Files"] = dict()
     blob["BaseFile"] = str(rel_files[BaseFileID])
     blob["Token"] = token
     blob["ReservedVariable"] = reserved_var
 
     # Filling some metadata
+    blob["Metadata"] = dict()
     blob["Metadata"]["Date"] = datetime.datetime.today()
     blob["Metadata"]["OS"] = platform.system()
     blob["Metadata"]["OSVersion"] = platform.version()
     blob["Metadata"]["User"] = platform.node()
 
     # Then, read files and place them as binary streams into the blob
+    blob["Files"] = dict()
     for index, file in enumerate(files):
         with open(file, "rb") as f:
             blob["Files"][str(rel_files[index])] = f.read()
 
-    # Now, export the blob into a file
+    # Now, export the blob into a bytestream
     blob_bytes = pickle.dumps(blob)
 
-    # Get a hash of the data
+    # Get a hash of the bytestream
     hasher = hashlib.sha3_512()
     hasher.update(blob_bytes)
     hash = hasher.digest()
     hash_len = len(hash)
 
+    # Write to the file the different data, in order
     with open("data.template", "wb") as f:
         f.write(struct.pack(">I", hash_len))  # 4 bytes used !
         f.write(hash)
         f.write(blob_bytes)
 
+    # Show the user the medatata we used
     printMetadata(
         hash,
         blob["Metadata"]["OS"],
@@ -201,6 +197,7 @@ def Encoder():
         blob["Metadata"]["User"],
     )
 
+    # End message
     printEnd()
 
     return 0

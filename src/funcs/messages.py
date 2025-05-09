@@ -61,3 +61,26 @@ def printMetadata(Hash, OS, Version, Date, User):
 # Make sure they're correct !
 ==============================================================================="""
     )
+
+
+def AskUserInteger(message, max):
+    # Then, ask the user to select the .template file that is found !
+    while True:
+
+        # Securely ask the user for a number
+        try:
+            ID = int(input(message))
+
+            # Validate user input
+            if ID <= max:
+                return ID
+            else:
+                print("Valid input, but it does not correspond to anything known...")
+
+        # User cancel script
+        except KeyboardInterrupt:
+            return -1
+
+        # NaN
+        except:
+            print("Please enter valid ID !")
