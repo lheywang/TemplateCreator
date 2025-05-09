@@ -43,7 +43,7 @@ def printEnd():
 # Just a reminder : This blob isn't encrypted properly and thus SHALL NOT     #\n\
 # contain any sensitive data. I, as the developper can't be sued for any      #\n\
 # data loss /                                                                 #\n\
-# corruption / leak !                                                         """
+# corruption / leak !                                                         #"""
     )
 
 

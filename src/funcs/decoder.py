@@ -11,6 +11,7 @@ import pickle
 import pathlib
 import hashlib
 import struct
+import zlib
 
 # Other files
 from .messages import printFiles, printSep, printMetadata, AskUserInteger
@@ -130,6 +131,9 @@ def Decoder():
     tmp_dict = dict()
     for index, file in enumerate(data["Files"]):
 
+        # Get path of the file. May be modified if needed.
+        p = pathlib.Path(file)
+
         # Check if the file is the base one
         if file == data["BaseFile"]:
 
@@ -161,10 +165,13 @@ def Decoder():
     # Then, iterate over file, customize if needed, and write them.
     for index, file in enumerate(data["Files"]):
 
+        # Uncompress the data
+        datab = zlib.decompress(data["Files"][file])
+
         if file in data["EditRequired"]:
 
             # Decode byte encoded string.
-            tmp_content = data["Files"][file].decode()
+            tmp_content = datab.decode()
 
             # Iterate over variables to be modified
             for var in variables:
@@ -173,11 +180,11 @@ def Decoder():
                 )
 
             # Save into the dict the modified variable
-            data["Files"][file] = tmp_content.encode()
+            datab = tmp_content.encode()
 
         # Perform write operation, as binary to let the \n char and other be real (and not treated as strings)
         with open(file, "wb") as f:
-            f.write(data["Files"][file])
+            f.write(datab)
 
         print(f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}")
 

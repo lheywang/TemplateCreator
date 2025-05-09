@@ -13,6 +13,7 @@ import datetime
 import platform
 import hashlib
 import struct
+import zlib
 
 from .messages import printEnd, printFiles, printSep, printMetadata, AskUserInteger
 
@@ -36,7 +37,10 @@ def Encoder():
 
     # Reading config files
     config = None
-    with open("../config/config.toml", "rb") as f:
+    p = pathlib.Path(__file__).parent.resolve()
+    p = p / "../../config/config.toml"
+
+    with open(str(p), "rb") as f:
         config = tomllib.load(f)
 
     # Setting some variable to track state of the program
@@ -77,7 +81,7 @@ def Encoder():
     reserved_var = config["Reader"]["ReservedVariable"]
 
     # Iterate over file, try to read them and search for replacement tokens
-    for file in files:
+    for index, file in enumerate(files):
         try:
             # Try to open and reas the file.
             with open(file, "r") as f:
@@ -117,6 +121,8 @@ def Encoder():
         except UnicodeDecodeError:
             binary_files.append(file)
             continue
+
+        print(f"Rode       [{(index + 1):3} / {len(files):3}] : {file}")
 
     # Remove variables that are tied to the project name (this variable will be
     # asked globally, and shall not be in the variable list)
@@ -167,11 +173,13 @@ def Encoder():
     blob["Metadata"]["OSVersion"] = platform.version()
     blob["Metadata"]["User"] = platform.node()
 
-    # Then, read files and place them as binary streams into the blob
+    # Then, read files and place them as binary streams into the blob while compressing it.
     blob["Files"] = dict()
     for index, file in enumerate(files):
         with open(file, "rb") as f:
-            blob["Files"][str(rel_files[index])] = f.read()
+            blob["Files"][str(rel_files[index])] = zlib.compress(f.read())
+
+        print(f"Compressed [{(index + 1):3} / {len(files):3}] : {file}")
 
     # Now, export the blob into a bytestream
     blob_bytes = pickle.dumps(blob)
@@ -183,7 +191,8 @@ def Encoder():
     hash_len = len(hash)
 
     # Write to the file the different data, in order
-    with open("data.template", "wb") as f:
+    output = pathlib.Path(input_path) / "data.template"
+    with open(str(output), "wb") as f:
         f.write(struct.pack(">I", hash_len))  # 4 bytes used !
         f.write(hash)
         f.write(blob_bytes)
