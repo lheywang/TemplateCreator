@@ -7,11 +7,13 @@
 # -------------------------------------------------------------------------------
 
 # Modules import
-import pickle
-import pathlib
-import hashlib
-import struct
-import zlib
+import pickle  # base python
+import pathlib  # Python 3.4
+import hashlib  # Python 3.6 (changes in 3.12 fallback, shall not cause issues but who know...)
+import struct  # base python
+import zlib  # base python
+
+# Minimal comp : Python 3.6
 
 # Other files
 from .messages import printFiles, printSep, printMetadata, AskUserInteger

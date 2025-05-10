@@ -6,7 +6,11 @@ def printHome():
         """\
 ===============================================================================\n\
 # Welcome on the Template  tool !                                             #\n\
-# Do you want to read or write a template file ? (write require python >3.11) #\n\
+# Do you want to read or write a template file ?                              #\n\
+#                                                                             #\n\
+# Requirements :                                                              #\n\
+#   - Reading template : Python 3.6                                           #\n\
+#   - Writing template : Python 3.11                                          #\n\
 #                                                                             #\n\
 # A file will be read / wrote, data.template.                                 #\n\
 ==============================================================================="""
