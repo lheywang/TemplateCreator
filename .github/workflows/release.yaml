@@ -54,6 +54,7 @@ jobs:
         with:
           tag_name: "Release"
           name: "TemplateCreator Release !"
+
           files: |
             artifacts/*.zip
             artifacts/*.tar.gz
