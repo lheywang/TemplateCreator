@@ -18,7 +18,7 @@ from .messages import printFiles, printSep, printMetadata, AskUserInteger
 
 
 # Encoder function
-def Decoder():
+def Decoder(script_path):
     """
     Decoder : Function that explore a template and create all files and customize them !
 
@@ -69,24 +69,11 @@ def Decoder():
     hasher.update(pickled_data)
     hash = hasher.digest()
 
-    # Comparing hash to ensure they're matching.
-    # The user can force the manipulation if needed, but clearly not required !
+    # Comparing hash to ensure they're matching. If they're not, exit.
     if hash != stored_hash:
         printSep()
-        print("File hash do not correspond. Shall we continue ?")
-        # Action selection
-        print(f"- [{0:3}] : No")
-        print(f"- [{1:3}] : Yes (DANGEROUS !)")
-        # Wait for a correct user input :
-
-        # Ask the user to select a file
-        action = AskUserInteger("Continue ? ", 1)
-        printSep()
-
-        # Exit the code here, to ensure the binary data can't cause anything
-        if action == 0:
-            print("Exiting...")
-            return -128
+        print("File hash do not correspond. Exiting...")
+        return -128
 
     # Loading the pickled data
     data = pickle.loads(pickled_data)

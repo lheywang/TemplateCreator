@@ -19,7 +19,7 @@ from .messages import printEnd, printFiles, printSep, printMetadata, AskUserInte
 
 
 # Encoder function
-def Encoder():
+def Encoder(script_path):
     """
     Encoder :   Function that explore a folder and subfolder for files, parses files, and create an output blob.
                 Add some metadata and a hash value to ensure the pickled data has been correctly handled !
@@ -37,8 +37,7 @@ def Encoder():
 
     # Reading config files
     config = None
-    p = pathlib.Path(__file__).parent.resolve()
-    p = p / "../../config/config.toml"
+    p = script_path / "config/config.toml"
 
     with open(str(p), "rb") as f:
         config = tomllib.load(f)

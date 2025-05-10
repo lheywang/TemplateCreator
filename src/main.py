@@ -12,10 +12,16 @@ from funcs.encoder import Encoder
 from funcs.decoder import Decoder
 from funcs.help import HelpMsg
 
+import pathlib
+
+
 # Main file
-if __name__ == "__main__":
+def main():
     # Welcome message
     printHome()
+
+    # Fetch the script path, to handle config file IO easily.
+    script_path = pathlib.Path(__file__).parent.resolve()
 
     # Action selection
     print(f"- [{0:3}] : Open a file (.template)")
@@ -33,14 +39,17 @@ if __name__ == "__main__":
                 print(
                     "Enterred ID is valid but does not correspond to any known action !"
                 )
+        # User cancelled process
+        except KeyboardInterrupt:
+            return -128
         except:
             print("Please enter valid ID !")
 
     # Call the adequate function
     if action == 0:
-        rval = Decoder()
+        rval = Decoder(script_path)
     elif action == 1:
-        rval = Encoder()
+        rval = Encoder(script_path)
     elif action == 2:
         rval = HelpMsg()
 
@@ -48,4 +57,9 @@ if __name__ == "__main__":
     printSep()
 
     # End of the script
-    exit(rval)
+    return rval
+
+
+# Call the main
+if __name__ == "__main__":
+    main()
