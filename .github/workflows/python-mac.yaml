@@ -35,10 +35,10 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "template-creator-linux" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
+          pyinstaller --clean -y -n "template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
       - name: Create .tar.gz
         run: |
-          tar -czvf YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
-          echo "RELEASE_NAME=YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
-          echo "RELEASE_FILE=YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
+          tar -czvf template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
+          echo "RELEASE_NAME=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
+          echo "RELEASE_FILE=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
