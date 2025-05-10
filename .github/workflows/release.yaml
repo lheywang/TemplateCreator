@@ -1,26 +1,27 @@
 name: Release Application
 
 on:
-  workflow_run:
-    workflows:
-      - "Windows-Build"
-      - "MacOS-Build"
-      - "Linux-Build"
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
 
-    # Add a conditional check to the job
-    if: |
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.workflow_name == 'Linux-Build' ||
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.workflow_name == 'MacOS-Build' ||
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.workflow_name == 'Windows-Build'
+  # Run the Linux build
+  job1:
+  uses: lheywang/TemplateCreator/.github/workflows/python-linux.yaml
+
+  # Run the Windows build
+  job2:
+  uses: lheywang/TemplateCreator/.github/workflows/python-windows.yaml
+
+  # Run the MacOS build
+  job3:
+  uses: lheywang/TemplateCreator/.github/workflows/python-mac.yaml
+
+  job4:
+    runs-on: ubuntu-latest
+    needs: [job1, job2, job3]
 
     steps:
       # Checkout git
