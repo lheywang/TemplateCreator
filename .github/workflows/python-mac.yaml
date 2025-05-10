@@ -33,7 +33,7 @@ jobs:
       # Build the app
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
+          pyinstaller --clean -y -n "template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.bin" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
       # Compress sources
       - name: Create .tar.gz
@@ -53,4 +53,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: executable-template-creator-aarch64_mac
-          path: dist/template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app
+          path: dist/template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.bin
