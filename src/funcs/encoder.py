@@ -93,7 +93,6 @@ def Encoder(
         # Handle files that aren't text (images...) and flag them as binary
         except UnicodeDecodeError:
             binary_files.append(file)
-            continue
 
         if verbose > 1:
             print(f"Rode       [{(index + 1):3} / {len(files):3}] : {file}")
@@ -173,7 +172,4 @@ def Encoder(
 
         # Add an end message
         printEnd()
-
-    print(blob)
-
     return 0
