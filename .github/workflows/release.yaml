@@ -52,6 +52,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: "Release"
+          name: "Template creator Release"
           files: |
             artifacts/*.zip
             artifacts/*.tar.gz
