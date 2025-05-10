@@ -12,16 +12,56 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+
+    # Add a conditional check to the job
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.workflow_name == 'Linux-Build' ||
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.workflow_name == 'MacOS-Build' ||
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.workflow_name == 'Windows-Build'
+
     steps:
+      # Checkout git
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Download Artifacts
+      - name: Create an artifact folder
+        run: |
+          mkdir -p artifacts
+          mkdir -p artifacts/Windows
+          mkdir -p artifacts/Linux
+          mkdir -p artifacts/MacOS
+
+      # Download the Windows artifacts
+      - name: Download Artifacts - Windows
         uses: actions/download-artifact@v3
         with:
-          path: artifacts/
+          name: |
+            artifact-template-creator-x86_64-windows
+            executable-template-creator-x86_64_windows
+          path: artifacts/Windows
+
+      # Download the MacOS artifacts
+      - name: Download Artifacts - macOS
+        uses: actions/download-artifact@v3
+        with:
+          name: |
+            artifact-template-creator-aarch64_mac
+            executable-template-creator-aarch64_mac
+          path: artifacts/MacOS
+
+      # Download the Linux artifacts
+      - name: Download Artifacts - Linux
+        uses: actions/download-artifact@v3
+        with:
+          name: |
+            artifact-template-creator-x86_64-linux
+            exectuable-template-creator-x86_64-linux
+          path: artifacts/Linux
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -29,10 +69,13 @@ jobs:
           tag_name: "v${{ github.event.workflow_run.head_commit.message }}"
           name: "Your Application v${{ github.event.workflow_run.head_commit.message }}"
           body: |
-            Release of Your Application.
-            Includes Linux, Windows, and macOS executables and archives.
+            Application release, contain all executables for :
+              - Linux x86_64
+              - Windows x86_64
+              - MacOS aarch64
+
+            As well as zip files for the different platforms (require a bare python installation).
           files: |
             artifacts/Windows/*
             artifacts/MacOS/*
             artifacts/Linux/*
-        if: ${{ always() }}

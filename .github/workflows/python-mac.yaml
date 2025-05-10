@@ -15,39 +15,44 @@ jobs:
         with:
           fetch-depth: 0 # Needed for proper versioning with setuptools-scm
 
-      # Multiples runs for different python versions.
+      # Configure python version
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
 
+      # Install dependcies
       - name: Install dependencies (no dependencies required for the tool !)
         run: |
           python -m pip install pyinstaller setuptools-scm
 
+      # Get commit ID to get a version number
       - name: Get App Version
         id: get_version
         run: |
           echo "APP_VERSION=$(python -c 'from setuptools_scm import get_version; print(get_version())')" >> $GITHUB_OUTPUT
 
+      # Build the app
       - name: Build with PyInstaller
         run: |
           pyinstaller --clean -y -n "template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
+      # Compress sources
       - name: Create .tar.gz
         run: |
           tar -czvf template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
           echo "RELEASE_NAME=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
           echo "RELEASE_FILE=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
 
+      # Upload files (zip and executable, under a fixed name)
       - name: Upload zip file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz
+          name: artifact-template-creator-aarch64_mac
           path: template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: executable-template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app
+          name: executable-template-creator-aarch64_mac
           path: dist/template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.app

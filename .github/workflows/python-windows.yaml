@@ -15,39 +15,44 @@ jobs:
         with:
           fetch-depth: 0 # Needed for proper versioning with setuptools-scm
 
-      # Multiples runs for different python versions.
+      # Configure python version
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
 
+      # Install dependcies
       - name: Install dependencies (no dependencies required for the tool !)
         run: |
           python -m pip install pyinstaller setuptools-scm
 
+      # Get commit ID to get a version number
       - name: Get App Version
         id: get_version
         run: |
           echo "APP_VERSION=$(python -c 'from setuptools_scm import get_version; print(get_version())')" >> $GITHUB_OUTPUT
 
+      # Build the app
       - name: Build with PyInstaller
         run: |
           pyinstaller --clean -y -n "template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
+      # Compress sources
       - name: Create .tar.gz
         run: |
           Compress-Archive src template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip
           echo "template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip" >> $GITHUB_ENV
           echo "template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip" >> $GITHUB_ENV
 
+      # Upload files (zip and executable, under a fixed name)
       - name: Upload zip file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip
+          name: artifact-template-creator-x86_64-windows
           path: template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: executable-template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
+          name: executable-template-creator-x86_64_windows
           path: dist/template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
