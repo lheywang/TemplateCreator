@@ -1,0 +1,38 @@
+name: Release Application
+
+on:
+  workflow_run:
+    workflows:
+      - "Windows-Build"
+      - "MacOS-Build"
+      - "Linux-Build"
+    types:
+      - completed
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ github.event.workflow_run.head_commit.message }}"
+          name: "Your Application v${{ github.event.workflow_run.head_commit.message }}"
+          body: |
+            Release of Your Application.
+            Includes Linux, Windows, and macOS executables and archives.
+          files: |
+            artifacts/Windows/*
+            artifacts/MacOS/*
+            artifacts/Linux/*
+        if: ${{ always() }}
