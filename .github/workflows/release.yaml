@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   # Run the Linux build
   job1:
@@ -54,12 +57,7 @@ jobs:
         with:
           tag_name: "v${{ github.event.workflow_run.head_commit.message }}"
           name: "Your Application v${{ github.event.workflow_run.head_commit.message }}"
-          body: |
-            Application release, contain all executables for :
-              - Linux x86_64
-              - Windows x86_64
-              - MacOS aarch64
-
-            As well as zip files for the different platforms (require a bare python installation).
           files: |
             artifacts/*
+          draft: false
+          generate_release_notes: true
