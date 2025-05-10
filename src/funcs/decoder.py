@@ -16,89 +16,67 @@ import zlib  # base python
 # Minimal comp : Python 3.6
 
 # Other files
-from .messages import printFiles, printSep, printMetadata, AskUserInteger
+from .messages import printSep
+from .utilities import HashBytes
 
 
 # Encoder function
-def Decoder(script_path):
+def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
     """
-    Decoder : Function that explore a template and create all files and customize them !
+    Decoder : Decode a defined template file and output a customized folder structure.
 
-    Arguments :
-        None
+        Arguments :
+            - template (str) :          The path for the template file to be outputed.
+            - ignore_variables (bool) : Shall we ignore variables (they thus won't be subsitued).
+            - verbose :                 The verbose level. 0 = No verbose. 1 = Step verbose. 2 = Full verbose.
+            - output :                  Output folder where the files need to be expanded.
 
-    Returns :
-        Integer :
-            0 = SUCESS
-            !0 = ERROR
+        Returns (int) :
+            - -1 :                      Template file too small. Did you pass the right file ?
+            - -2 :                      Hash does not correspond. The file has been modified.
     """
-
-    # First, search for .template file where the script is called
-    act_path = pathlib.Path(".").glob("*.template")
-    files = [x for x in act_path if x.is_file()]
-    printFiles(files)
-
-    # Ask the user to select a file
-    BaseFileID = AskUserInteger(
-        "Enter the ID of the file to be rode ? ", (len(files) - 1)
-    )
+    # Create different paths
+    template_path = pathlib.Path(template)
+    output_path = pathlib.Path(output)
 
     # Then, ensure the file has not been modified by comparing the stored hash and the
     # locally calculated one.
-    with open(files[BaseFileID], "rb") as f:
+    with open(str(template_path), "rb") as f:
 
         # Reading the hash length
         hash_len_bytes = f.read(4)
         if not hash_len_bytes or len(hash_len_bytes) < 4:
-            print("File is too short to contain hash length.")
+            if verbose > 0:
+                print("File is too short to contain hash length.")
             return -1
         hash_len = struct.unpack(">I", hash_len_bytes)[0]
 
         # Read the hash
         stored_hash = f.read(hash_len)
         if not stored_hash:
-            print("File does not contain hash data.")
-            return -2
+            if verbose > 0:
+                print("File does not contain hash data.")
+            return -1
 
         # Read the data (binary for now)
         pickled_data = f.read()
         if not pickled_data:
-            print("File does not contain pickled data.")
-            return -3
+            if verbose > 0:
+                print("File does not contain pickled data.")
+            return -1
 
     # Hashing the whole data to ensure it didn't move
-    hasher = hashlib.sha3_512()
-    hasher.update(pickled_data)
-    hash = hasher.digest()
+    hash = HashBytes(pickled_data)
 
     # Comparing hash to ensure they're matching. If they're not, exit.
     if hash != stored_hash:
-        printSep()
-        print("File hash do not correspond. Exiting...")
-        return -128
+        if verbose > 0:
+            printSep()
+            print("File hash do not correspond. Exiting...")
+        return -2
 
     # Loading the pickled data
     data = pickle.loads(pickled_data)
-
-    # Showing to the user some metadata about the file :
-    printMetadata(
-        hash,
-        data["Metadata"]["OS"],
-        data["Metadata"]["OSVersion"],
-        data["Metadata"]["Date"],
-        data["Metadata"]["User"],
-    )
-
-    # Ask the user if the metadata are correct
-    print(f"- [{0:3}] : No")
-    print(f"- [{1:3}] : Yes")
-    action = AskUserInteger("Are the metadata correct ? ", 1)
-    printSep()
-
-    # Exit if no
-    if action == 0:
-        print("Exiting...")
-        return -129
 
     # Ask for the base filename ?
     variables = dict()
@@ -107,13 +85,23 @@ def Decoder(script_path):
     )
 
     # Ask the user for the different variables that where listed
-    printSep()
-    print("Now enter the values for the different variables :")
+    if ignore_variables == False:
+        printSep()
+        print("Now enter the values for the different variables :")
     for index, var in enumerate(data["VarList"]):
+
         if var != data["ReservedVariable"]:
-            val = str(input(f"- [{index:3}] : {var} = "))
+
+            # Let the the variable name as default
+            if ignore_variables == False:
+                val = str(input(f"- [{index:3}] : {var} = "))
+            else:
+                val = f"{data["Token"]}{var}{data["Token"]}"
+
             variables[var] = val
-    printSep()
+
+    if verbose > 0:
+        printSep()
 
     # Load the files, and create them on the target computer.
     # If the file is the one where it's name shall be modified, change it.
@@ -135,21 +123,28 @@ def Decoder(script_path):
             # Flag the new file to the edited :
             data["EditRequired"].append(str(p))
 
+        # Update the output file with the wanted output
+        tmp = output_path / p
+
         # In any case, create parents and write "" to the file to ensure the OS will create it.
-        if not p.exists():
-            p.parent.mkdir(parents=True, exist_ok=True)
-        with open(p, "w+") as f:
+        if not tmp.exists():
+            tmp.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(str(tmp), "w+") as f:
             f.write("")
 
         # Append new file name to a temp dict (we can"t update the keys of a dict while iterating over it)
         tmp_dict[str(p)] = data["Files"][file]
 
         # User logs
-        print(f"Customized [{(index + 1):3} / {len(data["Files"]):3}] : {str(p)}")
+        if verbose > 1:
+            print(f"Customized [{(index + 1):3} / {len(data["Files"]):3}] : {str(p)}")
 
     # Copy the temp dict to the real one (and thus update the file names !)
     data["Files"] = tmp_dict
-    printSep()
+
+    if verbose > 0:
+        printSep()
 
     # Then, iterate over file, customize if needed, and write them.
     for index, file in enumerate(data["Files"]):
@@ -172,13 +167,16 @@ def Decoder(script_path):
             datab = tmp_content.encode()
 
         # Perform write operation, as binary to let the \n char and other be real (and not treated as strings)
-        with open(file, "wb") as f:
+        tmp = output_path / pathlib.Path(file)
+        with open(str(tmp), "wb") as f:
             f.write(datab)
 
-        print(f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}")
+        if verbose > 1:
+            print(f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}")
 
     # User end logs
-    printSep()
-    print("Finished creating a new folder from template !")
+    if verbose > 1:
+        printSep()
+        print("Finished creating a new folder from template !")
 
     return 0
