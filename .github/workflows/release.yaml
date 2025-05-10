@@ -57,6 +57,4 @@ jobs:
 
             As well as zip files for the different platforms (require a bare python installation).
           files: |
-            artifacts/Windows/*
-            artifacts/MacOS/*
-            artifacts/Linux/*
+            artifacts/*
