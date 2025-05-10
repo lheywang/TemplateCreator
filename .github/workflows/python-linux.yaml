@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code
@@ -22,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
 
       - name: Install dependencies (no dependencies required for the tool !)
         run: |
@@ -42,3 +39,15 @@ jobs:
           tar -czvf template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
           echo "RELEASE_NAME=template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
           echo "RELEASE_FILE=template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload zip file to repo
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz
+          path: template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz
+
+      - name: Upload executable file to repo
+        uses: actions/upload-artifact@v4
+        with:
+          name: exectuable-template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.elf
+          path: dist/template-creator-x86_64-linux-${{ steps.get_version.outputs.APP_VERSION }}.elf
