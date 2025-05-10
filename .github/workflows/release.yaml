@@ -52,8 +52,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: "v${{ github.event.workflow_run.head_commit.message }}"
-          name: "Your Application v${{ github.event.workflow_run.head_commit.message }}"
+          tag_name: "Release:TemplateCreator"
+          name: "Template Creator, release !"
           files: |
             artifacts/*.zip
             artifacts/*.tar.gz
