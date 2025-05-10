@@ -43,6 +43,11 @@ jobs:
           path: artifacts/
           merge-multiple: true
 
+      # List of artifacts
+      - name: List artifacts
+        run: |
+          ls -la artifacts/
+
       # Create a release
       - name: Create Release
         uses: softprops/action-gh-release@v1
