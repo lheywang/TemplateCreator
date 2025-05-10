@@ -55,11 +55,7 @@ jobs:
           tag_name: "Release"
           name: "Template creator Release"
           files: |
-            artifacts/*.zip
-            artifacts/*.tar.gz
-            artifacts/*.elf
-            artifacts/*.exe
-            artifacts/*.app
+            artifacts/*
 
           draft: false
           generate_release_notes: true
