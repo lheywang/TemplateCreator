@@ -33,24 +33,18 @@ jobs:
       # Build the app
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
-
-      # Compress sources
-      - name: Create .tar.gz
-        run: |
-          Compress-Archive src template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip
-          echo "template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip" >> $GITHUB_ENV
-          echo "template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip" >> $GITHUB_ENV
+          pyinstaller --clean -y -n "tcreator-open-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+          pyinstaller --clean -y -n "tcreator-write-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --icon="icons/icon.ico" src/tcreator-write.py
 
       # Upload files (zip and executable, under a fixed name)
-      - name: Upload zip file to repo
+      - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-template-creator-x86_64-windows
-          path: template-creator-x86_64-windows-${{ steps.get_version.outputs.APP_VERSION }}.zip
+          name: tcreator-open-x86_64-windows
+          path: dist/tcreator-open-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: executable-template-creator-x86_64_windows
-          path: dist/template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
+          name: tcreator-write-x86_64_windows
+          path: dist/tcreator-write-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe

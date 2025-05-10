@@ -33,24 +33,18 @@ jobs:
       # Build the app
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.bin" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
-
-      # Compress sources
-      - name: Create .tar.gz
-        run: |
-          tar -czvf template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
-          echo "RELEASE_NAME=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
-          echo "RELEASE_FILE=template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
+          pyinstaller --clean -y -n "tcreator-open-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+          pyinstaller --clean -y -n "tcreator-write-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}" --onefile --icon="icons/icon.ico" src/tcreator-write.py
 
       # Upload files (zip and executable, under a fixed name)
-      - name: Upload zip file to repo
+      - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-template-creator-aarch64_mac
-          path: template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz
+          name: tcreator-open-aarch64_mac
+          path: dist/tcreator-open-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
-          name: executable-template-creator-aarch64_mac
-          path: dist/template-creator-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}.bin
+          name: tcreator-write-aarch64_mac
+          path: dist/tcreator-write-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}
