@@ -33,18 +33,18 @@ jobs:
       # Build the app
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "tcreator-open-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --icon="icons/icon.ico" src/tcreator-open.py
-          pyinstaller --clean -y -n "tcreator-write-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --icon="icons/icon.ico" src/tcreator-write.py
+          pyinstaller --clean -y -n "tcreator-open-x86_64_windows.exe" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+          pyinstaller --clean -y -n "tcreator-write-x86_64_windows.exe" --onefile --icon="icons/icon.ico" src/tcreator-write.py
 
       # Upload files (zip and executable, under a fixed name)
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-open-x86_64-windows
-          path: dist/tcreator-open-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
+          path: dist/tcreator-open-x86_64_windows.exe
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-write-x86_64_windows
-          path: dist/tcreator-write-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe
+          path: dist/tcreator-write-x86_64_windows.exe

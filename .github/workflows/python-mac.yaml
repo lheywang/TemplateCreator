@@ -33,18 +33,18 @@ jobs:
       # Build the app
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "tcreator-open-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}" --onefile --icon="icons/icon.ico" src/tcreator-open.py
-          pyinstaller --clean -y -n "tcreator-write-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}" --onefile --icon="icons/icon.ico" src/tcreator-write.py
+          pyinstaller --clean -y -n "tcreator-open-aarch64_mac" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+          pyinstaller --clean -y -n "tcreator-write-aarch64_mac" --onefile --icon="icons/icon.ico" src/tcreator-write.py
 
       # Upload files (zip and executable, under a fixed name)
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-open-aarch64_mac
-          path: dist/tcreator-open-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}
+          path: dist/tcreator-open-aarch64_mac
 
       - name: Upload executable file to repo
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-write-aarch64_mac
-          path: dist/tcreator-write-aarch64_mac-${{ steps.get_version.outputs.APP_VERSION }}
+          path: dist/tcreator-write-aarch64_mac
