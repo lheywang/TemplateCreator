@@ -1,0 +1,47 @@
+name: Build and Release with PyInstaller (Linux)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version:
+          ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Needed for proper versioning with setuptools-scm
+
+      # Multiples runs for different python versions.
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies (no dependencies required for the tool !)
+        run: |
+          python -m pip install pyinstaller setuptools-scm
+
+      - name: Get App Version
+        id: get_version
+        run: |
+          echo "APP_VERSION=$(python -c 'from setuptools_scm import get_version; print(get_version())')" >> $GITHUB_OUTPUT
+
+      - name: Build with PyInstaller
+        run: |
+          PYINSTALLER_COMMAND="pyinstaller --clean -y -n "template-creator-linux" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py"
+          echo "Running PyInstaller command: $PYINSTALLER_COMMAND"
+          $PYINSTALLER_COMMAND
+
+      - name: Create .tar.gz
+        run: |
+          tar -czvf YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz src/
+          echo "RELEASE_NAME=YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
+          echo "RELEASE_FILE=YourAppName-Linux-x64-${{ steps.get_version.outputs.APP_VERSION }}.tar.gz" >> $GITHUB_ENV
