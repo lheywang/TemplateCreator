@@ -58,6 +58,11 @@ jobs:
           tag_name: "v${{ github.event.workflow_run.head_commit.message }}"
           name: "Your Application v${{ github.event.workflow_run.head_commit.message }}"
           files: |
-            artifacts/*
+            artifacts/*.zip
+            artifacts/*.tar.gz
+            artifacts/*.elf
+            artifacts/*.exe
+            artifacts/*.app
+
           draft: false
           generate_release_notes: true
