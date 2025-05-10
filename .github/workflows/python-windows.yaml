@@ -35,7 +35,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          pyinstaller --clean -y -n "template-creator-x86_64_windows.exe" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
+          pyinstaller --clean -y -n "template-creator-x86_64_windows-${{ steps.get_version.outputs.APP_VERSION }}.exe" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
       - name: Create .tar.gz
         run: |
