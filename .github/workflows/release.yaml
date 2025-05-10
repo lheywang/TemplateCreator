@@ -6,18 +6,17 @@ on:
       - main
 
 jobs:
-
   # Run the Linux build
   job1:
-  uses: lheywang/TemplateCreator/.github/workflows/python-linux.yaml
+    uses: lheywang/TemplateCreator/.github/workflows/python-linux.yaml@main
 
   # Run the Windows build
   job2:
-  uses: lheywang/TemplateCreator/.github/workflows/python-windows.yaml
+    uses: lheywang/TemplateCreator/.github/workflows/python-windows.yaml@main
 
   # Run the MacOS build
   job3:
-  uses: lheywang/TemplateCreator/.github/workflows/python-mac.yaml
+    uses: lheywang/TemplateCreator/.github/workflows/python-mac.yaml@main
 
   job4:
     runs-on: ubuntu-latest
