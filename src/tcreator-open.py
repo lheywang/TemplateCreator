@@ -9,6 +9,7 @@
 
 # module import
 import argparse  # Python 3.2
+import sys
 
 # Code import
 from funcs.decoder import Decoder
@@ -76,4 +77,4 @@ def tcreator_open():
 
 if __name__ == "__main__":
     rval = tcreator_open()
-    exit(rval)
+    sys.exit(rval)

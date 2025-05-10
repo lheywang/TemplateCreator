@@ -8,6 +8,7 @@
 
 # Module import
 import argparse  # Python 3.2
+import sys
 
 # Code import
 from funcs.encoder import Encoder
@@ -87,4 +88,4 @@ def tcreator_write():
 
 if __name__ == "__main__":
     rval = tcreator_write()
-    exit(rval)
+    sys.exit(rval)
