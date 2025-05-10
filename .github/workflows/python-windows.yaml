@@ -1,4 +1,4 @@
-name: Build and Release with PyInstaller (Linux)
+name: Windows-Build
 
 on:
   push:
