@@ -10,8 +10,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version:
-          ["3.6", "3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code
@@ -36,9 +35,7 @@ jobs:
 
       - name: Build with PyInstaller
         run: |
-          PYINSTALLER_COMMAND="pyinstaller --clean -y -n "template-creator-linux" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py"
-          echo "Running PyInstaller command: $PYINSTALLER_COMMAND"
-          $PYINSTALLER_COMMAND
+          pyinstaller --clean -y -n "template-creator-linux" --onefile --add-data="src/config:config" --icon="icons/icon.ico" src/main.py
 
       - name: Create .tar.gz
         run: |
