@@ -22,7 +22,7 @@ jobs:
       # Install dependcies
       - name: Install dependencies (no dependencies required for the tool !)
         run: |
-          python -m pip install pyinstaller setuptools-scm
+          python -m pip install pyinstaller setuptools-scm pillow sv-ttk
 
       # Get commit ID to get a version number
       - name: Get App Version
