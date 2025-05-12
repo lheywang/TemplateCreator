@@ -35,7 +35,7 @@ def tcreator_open():
     parser = argparse.ArgumentParser(
         prog="tcreator-open",
         description="Open a .template file and expand it.",
-        epilog="WARNING : Actually, this tool does not support expanding variables by the command line interface. \nMake sure to be able to answer to the questions.",
+        epilog="WARNING : Actually, this tool will ask the user inputs. In case of automated use, set --ignorev to True to block this behavior. Variables will be left untouched then.",
     )
 
     # Adding arguments :
