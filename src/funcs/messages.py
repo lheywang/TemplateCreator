@@ -2,8 +2,7 @@ import datetime
 
 
 def printHome():
-    print(
-        """\
+    return """\
 ===============================================================================\n\
 # Welcome on the Template  tool !                                             #\n\
 # Do you want to read or write a template file ?                              #\n\
@@ -13,31 +12,25 @@ def printHome():
 #   - Writing template : Python 3.11                                          #\n\
 #                                                                             #\n\
 # A file will be read / wrote, data.template.                                 #\n\
-==============================================================================="""
-    )
-    return
+===============================================================================\n"""
 
 
 def printSep():
-    print(
-        "==============================================================================="
-    )
-    return
+    return "===============================================================================\n"
 
 
 def printFiles(files):
-    printSep()
-    print(
-        """\
-Found files on the target folder :"""
-    )
+    rval = """\
+Found files on the target folder :\n"""
+
     for index, file in enumerate(files):
-        print(f"- [{index:3}] : {file}")
+        rval = rval + (f"- [{index:3}] : {file}\n")
+
+    return rval
 
 
 def printEnd():
-    print(
-        """\
+    return """\
 # Exported a blob of the files into data.template. Feel free to share it,     #\n\
 # with your friends !                                                         #\n\
 #                                                                             #\n\
@@ -47,13 +40,11 @@ def printEnd():
 # Just a reminder : This blob isn't encrypted properly and thus SHALL NOT     #\n\
 # contain any sensitive data. I, as the developper can't be sued for any      #\n\
 # data loss /                                                                 #\n\
-# corruption / leak !                                                         #"""
-    )
+# corruption / leak !                                                         #\n"""
 
 
 def printMetadata(Hash, OS, Version, Date, User):
-    print(
-        f"""\
+    return f"""\
 ===============================================================================\n\
 # File contain theses metadatas :                                             #\n\
 #  - Hash       = {str(Hash)}\n\
@@ -63,8 +54,7 @@ def printMetadata(Hash, OS, Version, Date, User):
 #  - User       = {User}\n\
 #\n\
 # Make sure they're correct !
-==============================================================================="""
-    )
+===============================================================================\n"""
 
 
 def AskUserInteger(message, max):
