@@ -80,7 +80,14 @@ def tcreator_write():
         verbose = 0
 
     rval = Encoder(
-        args.folder, args.file, args.token, verbose, args.project, args.output
+        args.folder,
+        args.file,
+        args.token,
+        verbose,
+        args.project,
+        args.output,
+        None,
+        0,
     )
 
     return rval

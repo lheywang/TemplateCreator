@@ -71,7 +71,14 @@ def tcreator_open():
     else:
         verbose = 0
 
-    rval = Decoder(args.template, args.ignorev, verbose, args.output)
+    rval = Decoder(
+        args.template,
+        args.ignorev,
+        verbose,
+        args.output,
+        None,
+        0,
+    )
     return rval
 
 
