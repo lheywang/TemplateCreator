@@ -39,7 +39,7 @@ jobs:
           pyinstaller --clean -y -n "tcreator-write-x86_64_windows.exe" --onefile --icon="icons/icon.ico" src/tcreator-write.py
       - name: Build tcreator-gui
         run: |
-          pyinstaller --clean -y -n "tcreator-x86_64-windows.exe" --add-data="src/gui/logo_128.png" --onefile --icon="icons/icon.ico" src/tcreator-gui.py
+          pyinstaller --clean -y -n "tcreator-x86_64-windows.exe" --add-data="src/gui/logo_128.png:gui/." --onefile --icon="icons/icon.ico" src/tcreator-gui.py
 
       # Upload files (zip and executable, under a fixed name)
       - name: Upload executable file to repo (open)
