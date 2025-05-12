@@ -31,20 +31,31 @@ jobs:
           echo "APP_VERSION=$(python -c 'from setuptools_scm import get_version; print(get_version())')" >> $GITHUB_OUTPUT
 
       # Build the app
-      - name: Build with PyInstaller
+      - name: Build tcreator-open
         run: |
           pyinstaller --clean -y -n "tcreator-open-aarch64_mac" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+      - name: Build tcreator-write
+        run: |
           pyinstaller --clean -y -n "tcreator-write-aarch64_mac" --onefile --icon="icons/icon.ico" src/tcreator-write.py
+      - name: Build tcreator-gui
+        run: |
+          pyinstaller --clean -y -n "tcreator-aarch64_mac" --add-data="src/gui/logo_128.png" --onefile --icon="icons/icon.ico" src/tcreator-gui.py
 
       # Upload files (zip and executable, under a fixed name)
-      - name: Upload executable file to repo
+      - name: Upload executable file to repo (open)
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-open-aarch64_mac
           path: dist/tcreator-open-aarch64_mac
 
-      - name: Upload executable file to repo
+      - name: Upload executable file to repo (write)
         uses: actions/upload-artifact@v4
         with:
           name: tcreator-write-aarch64_mac
           path: dist/tcreator-write-aarch64_mac
+
+      - name: Upload executable file to repo (gui)
+        uses: actions/upload-artifact@v4
+        with:
+          name: treator-x86_64-linux
+          path: dist/tcreator-aarch64_mac
