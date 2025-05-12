@@ -54,3 +54,64 @@ This include :
 - Decompressing data
 - Customizing files
 - Outputing files.
+
+## How to use it ?
+
+There is multiple ways to use it !
+The first is from the command line.
+
+### Writter :
+
+Invoke tcreator-write-[aarch ]-[OS ] command, with the following settings :
+
+```
+usage: tcreator-write [-h] [-o OUTPUT] [-v] [-t TOKEN] [-p PROJECT] folder file
+
+Create a template from a used folder
+
+positional arguments:
+  folder                Pass the folder you want to zip into a template
+  file                  Pass the file for which the name can be customized (ex : main file)
+
+options:
+  -h, --help            show this help message and exit
+  -o, --output OUTPUT   Change the output location of the template file.
+  -v, --verbose         Add logs output for the user
+  -t, --token TOKEN     Change the parsed token to identify variables. Can be usefull is your langage use the default one '##'
+  -p, --project PROJECT
+                        Change the name of the variable that is used as name for file, or any other customization.
+```
+
+### Openner :
+
+```
+usage: tcreator-open [-h] [-i] [-o OUTPUT] [-v] template
+
+Open a .template file and expand it.
+
+positional arguments:
+  template             Pass the .template file to be openned.
+
+options:
+  -h, --help           show this help message and exit
+  -i, --ignorev        Indicate to the script to ignore the input for the variables. Recommended for automated usages, not for final user.
+  -o, --output OUTPUT  Change the output destination of the expanded folder
+  -v, --verbose        Add logs output when running the command
+
+WARNING : Actually, this tool will ask the user inputs. In case of automated use, set --ignorev to True to block this behavior. Variables will be left untouched then.
+```
+
+### GUI
+
+> [!WARNING]
+> The GUI does not support full featured operations, such as token customization or main variable name change. For theses operations, the usage
+> the command line is recommended.
+
+The GUI does not require any arguments.
+Just launch :
+
+```
+tcreator
+```
+
+and the GUI will pop-up by itself. You then will be guided by choices and pop up !
