@@ -39,7 +39,7 @@ jobs:
           pyinstaller --clean -y -n "tcreator-write-aarch64_mac" --onefile --icon="icons/icon.ico" src/tcreator-write.py
       - name: Build tcreator-gui
         run: |
-          pyinstaller --clean -y -n "tcreator-aarch64_mac" --add-data="src/gui/logo_128.png:gui/." --onefile --icon="icons/icon.ico" src/tcreator-gui.py
+          pyinstaller --clean -y -n "tcreator-aarch64_mac" --add-data="src/gui/logo_128.png:gui/." --onefile --icon="icons/icon.ico" --hidden-import=sv_ttk --hidden-import=PIL._tkinter_finder src/tcreator-gui.py
 
       # Upload files (zip and executable, under a fixed name)
       - name: Upload executable file to repo (open)
