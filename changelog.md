@@ -25,7 +25,7 @@
 
 - First main.py script, that was a TUI.
 
-## v2025.05.02 :
+## v2025.05.05 :
 
 ### Added :
 
@@ -35,3 +35,4 @@
 
 - Changed internals functions prototype to handle the GUI
 - Added redirections to prints / input command to accomodate the GUI.
+- Changed (multiples times) build commands to ensure a correct operation of the whole tool for everyone !
