@@ -33,13 +33,13 @@ jobs:
       # Build the app
       - name: Build tcreator-open
         run: |
-          pyinstaller --clean -y -n "tcreator-open-x86_64-linux" --onefile --icon="icons/icon.ico" src/tcreator-open.py
+          pyinstaller --clean -y -n "tcreator-open-x86_64-linux" --onefile src/tcreator-open.py
       - name: Build tcreator-write
         run: |
-          pyinstaller --clean -y -n "tcreator-write-x86_64-linux" --onefile --icon="icons/icon.ico" src/tcreator-write.py
+          pyinstaller --clean -y -n "tcreator-write-x86_64-linux" --onefile src/tcreator-write.py
       - name: Build tcreator-gui
         run: |
-          pyinstaller --clean -y -n "tcreator-x86_64-linux" --add-data="src/gui/logo_128.png:gui/." --onefile --icon="icons/icon.ico" src/tcreator-gui.py
+          pyinstaller --clean -y -n "tcreator-x86_64-linux" --add-data="src/gui/logo_128.png:gui/." --onefile src/tcreator-gui.py
 
       # Upload executables
       - name: Upload executable file to repo (write)

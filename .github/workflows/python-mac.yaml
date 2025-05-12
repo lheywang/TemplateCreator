@@ -57,5 +57,5 @@ jobs:
       - name: Upload executable file to repo (gui)
         uses: actions/upload-artifact@v4
         with:
-          name: treator-x86_64-linux
+          name: treator-aarch64_mac
           path: dist/tcreator-aarch64_mac
