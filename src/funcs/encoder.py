@@ -17,27 +17,37 @@ import zlib  # base python
 # Others functions imports
 from .messages import printEnd, printMetadata
 from .utilities import ConvertPathToRelatives, HashBytes  # Require python 3.6
+from .guihelper import guiprint, guiinput
 
 # Minimal comp : Python 3.6
 
 
 # Functions
 def Encoder(
-    folder: str, file: str, token: str, verbose: int, reserved_var: str, output: str
+    folder: str,
+    file: str,
+    token: str,
+    verbose: int,
+    reserved_var: str,
+    output: str,
+    h_GUI,
+    mode: int,
 ):
     """
     Encoder function : Encode a folder into a template file
 
         Arguments :
-            folder (str):       The path of the folder to encoded.
-            file (str) :        The path of a file inside the folder where the name can be customized.
-            token (str) :       The searched token to identify variables.
-            verbose (int) :     The verbose level. 0 = No verbose. 1 = Step verbose. 2 = Full verbose.
-            reserved_var(str):  The variable used that will be used as file name, or any other usage.
-            output (str) :      The path of the folder where the data.template file is wrote.
+            - folder (str):             The path of the folder to encoded.
+            - file (str) :              The path of a file inside the folder where the name can be customized.
+            - token (str) :             The searched token to identify variables.
+            - verbose (int) :           The verbose level. 0 = No verbose. 1 = Step verbose. 2 = Full verbose.
+            - reserved_var(str):        The variable used that will be used as file name, or any other usage.
+            - output (str) :            The path of the folder where the data.template file is wrote.
+            - h_GUI :                   Handler to the GUI. Can be set to None if mode = 0.
+            - mode :                    Redirect output to : Console if == 0, GUI if == 1.
 
         Returns (int) :
-            - -1 :              The file is not in the passed folder.
+            - -1 :                      The file is not in the passed folder.
     """
     # Open the folder
     base_path = pathlib.Path(folder).glob("**/*")
@@ -94,8 +104,13 @@ def Encoder(
         except UnicodeDecodeError:
             binary_files.append(file)
 
-        if verbose > 1:
-            print(f"Rode       [{(index + 1):3} / {len(files):3}] : {file}")
+        guiprint(
+            h_GUI,
+            mode,
+            verbose,
+            1,
+            f"Rode       [{(index + 1):3} / {len(files):3}] : {file}",
+        )
 
     # Remove variables that are tied to the project name (this variable will be
     # asked globally, and shall not be in the variable list)
@@ -138,8 +153,13 @@ def Encoder(
         with open(file, "rb") as f:
             blob["Files"][str(rel_files[index])] = zlib.compress(f.read())
 
-        if verbose > 1:
-            print(f"Compressed [{(index + 1):3} / {len(files):3}] : {file}")
+            guiprint(
+                h_GUI,
+                mode,
+                verbose,
+                1,
+                f"Compressed [{(index + 1):3} / {len(files):3}] : {file}",
+            )
 
     # Now, export the blob into a bytestream
     blob_bytes = pickle.dumps(blob)
@@ -161,15 +181,27 @@ def Encoder(
         f.write(blob_bytes)
 
     # Show the user the medatata we used
-    if verbose > 0:
+    guiprint(
+        h_GUI,
+        mode,
+        verbose,
+        -1,
         printMetadata(
             hash,
             blob["Metadata"]["OS"],
             blob["Metadata"]["OSVersion"],
             blob["Metadata"]["Date"],
             blob["Metadata"]["User"],
-        )
+        ),
+    )
 
-        # Add an end message
-        printEnd()
+    # Open a final pop up
+    guiprint(
+        h_GUI,
+        mode,
+        verbose,
+        -1,
+        printEnd(),
+    )
+
     return 0

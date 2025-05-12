@@ -18,10 +18,18 @@ import zlib  # base python
 # Other files
 from .messages import printSep
 from .utilities import HashBytes
+from .guihelper import guiprint, guiinput
 
 
 # Encoder function
-def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
+def Decoder(
+    template: str,
+    ignore_variables: bool,
+    verbose: int,
+    output: str,
+    h_GUI,
+    mode: int,
+):
     """
     Decoder : Decode a defined template file and output a customized folder structure.
 
@@ -30,6 +38,8 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
             - ignore_variables (bool) : Shall we ignore variables (they thus won't be subsitued).
             - verbose :                 The verbose level. 0 = No verbose. 1 = Step verbose. 2 = Full verbose.
             - output :                  Output folder where the files need to be expanded.
+            - h_GUI :                   Handler to the GUI. Can be set to None if mode = 0.
+            - mode :                    Redirect output to : Console if == 0, GUI if == 1.
 
         Returns (int) :
             - -1 :                      Template file too small. Did you pass the right file ?
@@ -46,23 +56,39 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
         # Reading the hash length
         hash_len_bytes = f.read(4)
         if not hash_len_bytes or len(hash_len_bytes) < 4:
-            if verbose > 0:
-                print("File is too short to contain hash length.")
+            guiprint(
+                h_GUI,
+                mode,
+                verbose,
+                -1,
+                "File is too short to contain hash length. Aborting...",
+            )
             return -1
+
         hash_len = struct.unpack(">I", hash_len_bytes)[0]
 
         # Read the hash
         stored_hash = f.read(hash_len)
         if not stored_hash:
-            if verbose > 0:
-                print("File does not contain hash data.")
+            guiprint(
+                h_GUI,
+                mode,
+                verbose,
+                -1,
+                "File does not contain hash data. Aborting...",
+            )
             return -1
 
         # Read the data (binary for now)
         pickled_data = f.read()
         if not pickled_data:
-            if verbose > 0:
-                print("File does not contain pickled data.")
+            guiprint(
+                h_GUI,
+                mode,
+                verbose,
+                -1,
+                "File does not contain pickled data. Aborting...",
+            )
             return -1
 
     # Hashing the whole data to ensure it didn't move
@@ -70,9 +96,13 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
 
     # Comparing hash to ensure they're matching. If they're not, exit.
     if hash != stored_hash:
-        if verbose > 0:
-            printSep()
-            print("File hash do not correspond. Exiting...")
+        guiprint(
+            h_GUI,
+            mode,
+            verbose,
+            -1,
+            "File hash do not correspond. Aborting...",
+        )
         return -2
 
     # Loading the pickled data
@@ -80,28 +110,34 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
 
     # Ask for the base filename ?
     variables = dict()
-    variables[data["ReservedVariable"]] = input(
-        "What's the name of the project, to custom the base names ? "
+    variables[data["ReservedVariable"]] = guiinput(
+        h_GUI, mode, "What's the name of the project, to custom the base names ? "
     )
 
     # Ask the user for the different variables that where listed
     if ignore_variables == False:
-        printSep()
-        print("Now enter the values for the different variables :")
+        guiprint(
+            h_GUI,
+            mode,
+            verbose,
+            -1,
+            "Now enter the values for the different variables :",
+        )
     for index, var in enumerate(data["VarList"]):
 
         if var != data["ReservedVariable"]:
 
             # Let the the variable name as default
             if ignore_variables == False:
-                val = str(input(f"- [{index:3}] : {var} = "))
+                val = guiinput(
+                    h_GUI,
+                    mode,
+                    f"- [{index:3}] : {var} = ",
+                )
             else:
                 val = f"{data["Token"]}{var}{data["Token"]}"
 
             variables[var] = val
-
-    if verbose > 0:
-        printSep()
 
     # Load the files, and create them on the target computer.
     # If the file is the one where it's name shall be modified, change it.
@@ -137,14 +173,16 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
         tmp_dict[str(p)] = data["Files"][file]
 
         # User logs
-        if verbose > 1:
-            print(f"Customized [{(index + 1):3} / {len(data["Files"]):3}] : {str(p)}")
+        guiprint(
+            h_GUI,
+            mode,
+            verbose,
+            1,
+            f"Customized [{(index + 1):3} / {len(data["Files"]):3}] : {str(p)}",
+        )
 
     # Copy the temp dict to the real one (and thus update the file names !)
     data["Files"] = tmp_dict
-
-    if verbose > 0:
-        printSep()
 
     # Then, iterate over file, customize if needed, and write them.
     for index, file in enumerate(data["Files"]):
@@ -171,12 +209,21 @@ def Decoder(template: str, ignore_variables: bool, verbose: int, output: str):
         with open(str(tmp), "wb") as f:
             f.write(datab)
 
-        if verbose > 1:
-            print(f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}")
+        guiprint(
+            h_GUI,
+            mode,
+            verbose,
+            1,
+            f"Wrote      [{(index + 1):3} / {len(data["Files"]):3}] : {file}",
+        )
 
     # User end logs
-    if verbose > 1:
-        printSep()
-        print("Finished creating a new folder from template !")
+    guiprint(
+        h_GUI,
+        mode,
+        verbose,
+        -1,
+        "Finished creating a new folder from template !",
+    )
 
     return 0
